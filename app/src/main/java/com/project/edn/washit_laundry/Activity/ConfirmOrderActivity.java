@@ -37,7 +37,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private EditText edtDate;
     private EditText edtPrice;
     private Button btnSubmit;
-    private String iduser;
+    private String id;
     private ProgressDialog progressdialog;
     private Intent in;
     @Override
@@ -58,7 +58,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         btnSubmit.setOnClickListener(this);
         progressdialog=new ProgressDialog(this);
         in=getIntent();
-        iduser=in.getStringExtra("iduser");
+        id=in.getStringExtra("id");
 
     }
 
@@ -112,17 +112,17 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                         progressdialog.dismiss();
 
                         //Tambahkan apa yang terjadi setelah Pesan Error muncul, alternatif
-                        Toast.makeText(ConfirmOrderActivity.this, "Failed Load Your Data,Check Your Connection" , Toast.LENGTH_LONG).show();
+                        Toast.makeText(ConfirmOrderActivity.this, "Failed Load Your Data,Check Your Connection"+error.getMessage() , Toast.LENGTH_LONG).show();
 
                     }
                 }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("idorder",in.getStringExtra("id"));
-                params.put("date", edtDate.getText().toString());
-                params.put("price", edtPrice.getText().toString());
+                params.put("id_order",id);
                 params.put("ket", "confirm");
+                params.put("datefinish", edtDate.getText().toString());
+                params.put("cost", edtPrice.getText().toString());
                 //Parameter
 
                 return params;
@@ -160,6 +160,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
                         progressdialog.setMessage("Loading");
+                        progressdialog.show();
                         sendDataConfirm();                    }
                 });
         alertDialogBuilder.setNegativeButton("No",

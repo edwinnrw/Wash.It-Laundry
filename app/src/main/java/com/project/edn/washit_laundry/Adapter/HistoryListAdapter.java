@@ -32,7 +32,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public String ket,customername,orderno,datefinish,cost,orderdate,iduser;
+        public String ket,customername,orderno,datefinish,cost,orderdate,iduser,telp;
 
         public TextView date, status,addresspick;
         public ImageView image;
@@ -42,7 +42,6 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
             addresspick=(TextView)view.findViewById(R.id.addresspick);
             date = (TextView) view.findViewById(R.id.datepick);
             status = (TextView) view.findViewById(R.id.statusHistory);
-            addresspick=(TextView)view.findViewById(R.id.addresspick);
 
 
             view.setOnClickListener(this);
@@ -61,7 +60,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
             in.putExtra("datepick",date.getText().toString());
             in.putExtra("cost",cost);
             in.putExtra("Ket",ket);
-            in.putExtra("iduser",iduser);
+            in.putExtra("telp",telp);
             context.startActivity(in);
         }
     }
@@ -92,6 +91,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         holder.cost=history.getPrice();
         holder.ket=history.getKeterangan();
         holder.iduser=history.getIduser();
+        holder.telp=history.getTelp();
 
     }
 

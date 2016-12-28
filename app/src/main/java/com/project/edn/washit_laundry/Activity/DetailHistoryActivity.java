@@ -1,5 +1,6 @@
 package com.project.edn.washit_laundry.Activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -32,10 +33,11 @@ import java.util.Map;
 
 public class DetailHistoryActivity extends AppCompatActivity implements View.OnClickListener {
     private Button btnreport,btnconfirm,btnReject;
-    private TextView noorder,addresspick,orderdate,datefinish,datepick,cost,customername,status,number;
+    private TextView noorder,addresspick,orderdate,datefinish,datepick,cost,customername,status,telp;
     private Toolbar toolbar;
     private LinearLayout lnbtn;
-    private String iduser;
+    private String id;
+    private ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,22 +48,33 @@ public class DetailHistoryActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         Intent in=getIntent();
+        telp=(TextView)findViewById(R.id.telpCustomer);
+        if (!in.getStringExtra("telp").equalsIgnoreCase("")){
+            telp.setText(in.getStringExtra("telp"));
+        }
         datefinish = (TextView) findViewById(R.id.datefinish);
         datefinish.setText(in.getStringExtra("datefinish"));
         datepick = (TextView) findViewById(R.id.datePick);
         datepick.setText(in.getStringExtra("datepick"));
         cost = (TextView) findViewById(R.id.cost);
-        cost.setText(in.getStringExtra("cost"));
+        if (in.getStringExtra("cost").equalsIgnoreCase("")){
+            cost.setText("Waiting");
+
+        }else{
+            cost.setText("Rp."+in.getStringExtra("cost"));
+
+        }
         addresspick = (TextView) findViewById(R.id.addressCostomer);
         addresspick.setText(in.getStringExtra("addresscustomer"));
         orderdate = (TextView) findViewById(R.id.dateOrder);
-        orderdate.setText(in.getStringExtra("orderdate"));
+        orderdate.setText(in.getStringExtra("orderDate"));
         customername = (TextView) findViewById(R.id.customername);
         customername.setText(in.getStringExtra("customername"));
         status = (TextView) findViewById(R.id.status);
         status.setText(in.getStringExtra("status"));
         noorder = (TextView) findViewById(R.id.orderno);
-        this.noorder.setText("Order No:" + in.getStringExtra("noorder"));
+        id=in.getStringExtra("idorder");
+        this.noorder.setText("Order No:" + in.getStringExtra("idorder"));
         lnbtn=(LinearLayout)findViewById(R.id.lnbtn);
         btnreport=(Button)findViewById(R.id.btnreport);
         btnconfirm=(Button)findViewById(R.id.btnconfirm);
@@ -69,14 +82,14 @@ public class DetailHistoryActivity extends AppCompatActivity implements View.OnC
         btnreport.setOnClickListener(this);
         btnconfirm.setOnClickListener(this);
         btnReject.setOnClickListener(this);
-        iduser=in.getStringExtra("iduser");
-
+        progressDialog=new ProgressDialog(this);
+        progressDialog.setMessage("Loading..");
         switch (in.getStringExtra("Ket")){
-            case "Complete":
+            case "Completed":
                 lnbtn.setVisibility(View.GONE);
                 btnreport.setVisibility(View.GONE);
                 break;
-            case "Inprogress":
+            case "In Progress":
                 lnbtn.setVisibility(View.GONE);
                 btnreport.setVisibility(View.VISIBLE);
                 break;
@@ -105,14 +118,16 @@ public class DetailHistoryActivity extends AppCompatActivity implements View.OnC
         switch (view.getId()){
             case R.id.btnconfirm:
                 Intent in =new Intent(this,ConfirmOrderActivity.class);
-                in.putExtra("id", this.noorder.getText().toString());
+                in.putExtra("id",id );
                 startActivity(in);
                 break;
             case R.id.btnReject:
+                progressDialog.show();
                 sendInfoOrder("reject");
                 break;
             case R.id.btnreport:
-                sendInfoOrder("progress");
+                progressDialog.show();
+                sendInfoOrder("report");
                 break;
         }
     }
@@ -122,10 +137,12 @@ public class DetailHistoryActivity extends AppCompatActivity implements View.OnC
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-
+                        progressDialog.dismiss();
                         //Jika Respon server sukses
                         if (Success(response).equalsIgnoreCase("true")) {
                             Toast.makeText(DetailHistoryActivity.this, "Success ", Toast.LENGTH_LONG).show();
+                            Intent in=new Intent(DetailHistoryActivity.this,MainActivity.class);
+                            startActivity(in);
                         } else {
                             Toast.makeText(DetailHistoryActivity.this, "Failed ", Toast.LENGTH_LONG).show();
                         }
@@ -135,8 +152,9 @@ public class DetailHistoryActivity extends AppCompatActivity implements View.OnC
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
                         //Tambahkan apa yang terjadi setelah Pesan Error muncul, alternatif
-                        Toast.makeText(DetailHistoryActivity.this, "Failed Load Your Data,Check Your Connection" , Toast.LENGTH_LONG).show();
+                        Toast.makeText(DetailHistoryActivity.this, "Failed Load Your Data,Check Your Connection"+error.getMessage() , Toast.LENGTH_LONG).show();
 
                     }
                 }) {
@@ -144,8 +162,8 @@ public class DetailHistoryActivity extends AppCompatActivity implements View.OnC
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 //Parameter
-                params.put("idorder", noorder.getText().toString());
-                params.put("keterangan",ket);
+                params.put("id_order", id);
+                params.put("ket",ket);
 //                params.put("")
 //                params.put("token", token);
                 //Kembalikan Nilai parameter

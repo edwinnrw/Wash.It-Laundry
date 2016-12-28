@@ -151,11 +151,11 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
         String id="";
         try {
             JSONObject json2 = ((JSONObject) new JSONTokener(json).nextValue()).getJSONObject("data");
-//            storename = json3.getString("storename");
-//            address = json3.getString("address");
-//            material = json3.getString("material");
-//            service = json3.getString("service");
-//            hour = json3.getString("hour");
+            storename = json2.getString("storename");
+            address = json2.getString("address");
+            material = json2.getString("material");
+            service = json2.getString("service");
+            hour = json2.getString("hour");
             token = json2.getString(Config.TOKEN_SHARED_PREF);
             name = json2.getString("name");
             email = json2.getString("email");
@@ -166,6 +166,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
         }
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         editor.putBoolean(Config.LOGGEDIN_SHARED_PREF, true);
+        editor.putString("idlaundry",id);
         editor.putString("name", name);
         editor.putString("email", email);
         editor.putString("telp", telp);

@@ -7,8 +7,16 @@ package com.project.edn.washit_laundry.Model;
 public class History {
     private String id,iduser;
     private String name,image,addressLaundry,addressCustomer;
-    private String weight,price,datepick,datefinish,orderdate;
+    private String weight,price,datepick,datefinish,orderdate,telp;
     private  String status,keterangan;
+
+    public String getTelp() {
+        return telp;
+    }
+
+    public void setTelp(String telp) {
+        this.telp = telp;
+    }
 
     public String getIduser() {
         return iduser;

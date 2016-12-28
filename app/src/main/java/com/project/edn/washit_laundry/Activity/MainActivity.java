@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity
                     public void onErrorResponse(VolleyError error) {
                         //Tambahkan apa yang terjadi setelah Pesan Error muncul, alternatif
                         progressDialog.dismiss();
-                        Toast.makeText(MainActivity.this, "Login Failed,Check Your Connection", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Logout Failed,Check Your Connection", Toast.LENGTH_LONG).show();
 
                     }
                 }){

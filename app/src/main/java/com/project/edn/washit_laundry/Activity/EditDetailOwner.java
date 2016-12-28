@@ -1,6 +1,7 @@
 package com.project.edn.washit_laundry.Activity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -161,12 +162,12 @@ public class EditDetailOwner extends AppCompatActivity implements View.OnClickLi
             e.printStackTrace();
         }
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putBoolean(Config.LOGGEDIN_SHARED_PREF, true);
         editor.putString("name", name);
         editor.putString("email", email);
         editor.putString("telp", telp);
-        editor.putString(Config.TOKEN_SHARED_PREF, token);
-        editor.commit();
+        editor.apply();
+        Intent in=new Intent(this,AccountActivity.class);
+        startActivity(in);
     }
 
 }

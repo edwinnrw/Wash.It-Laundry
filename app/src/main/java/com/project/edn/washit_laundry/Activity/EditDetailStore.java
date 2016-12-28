@@ -1,6 +1,7 @@
 package com.project.edn.washit_laundry.Activity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,7 @@ import com.project.edn.washit_laundry.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +62,7 @@ public class EditDetailStore extends AppCompatActivity implements View.OnClickLi
         btnedit.setOnClickListener(this);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading");
+        Toast.makeText(this,sharedPreferences.getString("idlaundry",""),Toast.LENGTH_LONG).show();
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -101,15 +104,18 @@ public class EditDetailStore extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+
+
     private void requestChange() {
         StringRequest stringRequest1 = new StringRequest(Request.Method.POST, Config.API_STORECHANGE,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         progressDialog.dismiss();
-
+                        Toast.makeText(EditDetailStore.this,response,Toast.LENGTH_LONG).show();
                         //Jika Respon server sukses
                         if (Success(response).equalsIgnoreCase("true")) {
+                            jsonParse(response);
                             Toast.makeText(EditDetailStore.this, "Data successfully changed ", Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(EditDetailStore.this, "Data Not Successfully changed",Toast.LENGTH_LONG).show();
@@ -131,7 +137,8 @@ public class EditDetailStore extends AppCompatActivity implements View.OnClickLi
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("storename", editStorename.getText().toString().trim());
+                params.put("id_laundry",sharedPreferences.getString("idlaundry",""));
+                params.put("name", editStorename.getText().toString().trim());
                 params.put("address", editAddress.getText().toString().trim());
                 params.put("material",editMaterial.getText().toString().trim());
                 params.put("service", editService.getText().toString().trim());
@@ -147,6 +154,37 @@ public class EditDetailStore extends AppCompatActivity implements View.OnClickLi
 //        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 //        stringRequest1.setRetryPolicy(policy);
         requestQueue.add(stringRequest1);
+    }
+    public void jsonParse(String json) {
+        this.progressDialog.dismiss();
+        String storename="";
+        String address="";
+        String material="";
+        String service="";
+        String hour="";
+        String id="";
+        try {
+            JSONObject json3 = ((JSONObject) new JSONTokener(json).nextValue()).getJSONObject("data");
+            storename = json3.getString("storename");
+            address = json3.getString("address");
+            material = json3.getString("material");
+            service = json3.getString("service");
+            hour = json3.getString("hour");
+            id=json3.getString("id_laundry");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putBoolean(Config.LOGGEDIN_SHARED_PREF, true);
+        editor.putString("idlaundry",id);
+        editor.putString("storename", storename);
+        editor.putString("address", address);
+        editor.putString("material", material);
+        editor.putString("service", service);
+        editor.putString("hour", hour);
+        editor.commit();
+        Intent in=new Intent(this,AccountActivity.class);
+        startActivity(in);
     }
     public String Success(String json) {
         String succes = "";

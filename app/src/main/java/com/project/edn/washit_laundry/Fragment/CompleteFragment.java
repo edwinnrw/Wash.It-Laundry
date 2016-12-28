@@ -83,17 +83,17 @@ public class CompleteFragment extends Fragment implements SwipeRefreshLayout.OnR
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Toast.makeText(getActivity(),response,Toast.LENGTH_LONG).show();
                         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
                         //Jika Respon server sukses
                         if (Success(response).equalsIgnoreCase("true")){
-                            if (!sharedPreferences.getString("json","").equalsIgnoreCase(response)){
+                            if (!sharedPreferences.getString("jsonComplete","").equalsIgnoreCase(response)){
                                 if (ketlist.equalsIgnoreCase("update")) {
-
                                     //Getting editor
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     // put nilai false untuk login
-                                    editor.putString("json", response);
+                                    editor.putString("jsonComplete", response);
                                     editor.commit();
                                     getData();
 
@@ -101,24 +101,23 @@ public class CompleteFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 }if (ketlist.equalsIgnoreCase("new")){
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     // put nilai false untuk login
-                                    editor.putString("json", response);
+                                    editor.putString("jsonComplete", response);
                                     editor.commit();
                                     parseJson();
                                 }
 
                             }else {
-
                                 if(ketlist.equalsIgnoreCase("new")){
                                     parseJson();
+                                }else{
+                                    getData();
 
                                 }
-
                             }
 
                         }else {
 
                         }
-
 
                     }
                 },
@@ -126,7 +125,7 @@ public class CompleteFragment extends Fragment implements SwipeRefreshLayout.OnR
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //Tambahkan apa yang terjadi setelah Pesan Error muncul, alternatif
-                        Toast.makeText(getActivity(), "Failed Load Your Data,Check Your Connection" , Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Failed Load Your Data,Check Your Connection"+error.getMessage() , Toast.LENGTH_LONG).show();
 
                     }
                 }) {
@@ -166,7 +165,7 @@ public class CompleteFragment extends Fragment implements SwipeRefreshLayout.OnR
         progressBar.setVisibility(View.GONE);
         historyList = new ArrayList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String jsonCache=sharedPreferences.getString("json", "");
+        String jsonCache=sharedPreferences.getString("jsonComplete", "");
 
 
         try {
@@ -177,16 +176,16 @@ public class CompleteFragment extends Fragment implements SwipeRefreshLayout.OnR
                 JSONObject post = json2.optJSONObject(i);
                 History item = new History();
                 item.setName(post.optString("name"));
-                item.setId(post.optString("orderid"));
-                item.setAddressLaundry(post.optString("addressLaundry"));
-                item.setAddressCustomer(post.optString("addressCustomer"));
+                item.setImage(post.optString("image"));
+                item.setId(post.optString("id_order"));
+                item.setAddressCustomer(post.optString("address"));
                 item.setStatus(post.optString("status"));
                 item.setDatepick(post.optString("datepick"));
                 item.setDatefinish(post.optString("datefinish"));
-                item.setOrderdate(post.optString("orderdate"));
+                item.setOrderdate(post.optString("orderDate"));
                 item.setPrice(post.optString("cost"));
                 item.setKeterangan(post.optString("keterangan"));
-                item.setIduser(post.optString("id_user"));
+                item.setTelp(post.optString("telp"));
                 historyList.add(item);
                 adapter = new HistoryListAdapter(getActivity(), historyList);
                 mRecyclerView.setAdapter(adapter);
@@ -222,7 +221,7 @@ public class CompleteFragment extends Fragment implements SwipeRefreshLayout.OnR
     private void getData() {
         History item =new History();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String jsonCache=sharedPreferences.getString("json", "");
+        String jsonCache=sharedPreferences.getString("jsonComplete", "");
         try {
             JSONObject json1= (JSONObject) new JSONTokener(jsonCache).nextValue();
             JSONArray json2 = json1.getJSONArray("data");
@@ -231,19 +230,18 @@ public class CompleteFragment extends Fragment implements SwipeRefreshLayout.OnR
                 JSONObject post = json2.optJSONObject(i);
                 item.setName(post.optString("name"));
                 item.setImage(post.optString("image"));
-                item.setId(post.optString("orderid"));
-                item.setAddressLaundry(post.optString("addressLaundry"));
-                item.setAddressCustomer(post.optString("addressCustomer"));
+                item.setId(post.optString("id_order"));
+                item.setAddressCustomer(post.optString("address"));
                 item.setStatus(post.optString("status"));
                 item.setDatepick(post.optString("datepick"));
                 item.setDatefinish(post.optString("datefinish"));
-                item.setOrderdate(post.optString("orderdate"));
+                item.setOrderdate(post.optString("orderDate"));
                 item.setPrice(post.optString("cost"));
                 item.setKeterangan(post.optString("keterangan"));
                 item.setIduser(post.optString("id_user"));
-                historyList.add(item);
-                adapter = new HistoryListAdapter(getActivity(), historyList);
-                mRecyclerView.setAdapter(adapter);            }
+                item.setTelp(post.optString("telp"));
+                historyList.clear();
+                historyList.add(item);           }
 
 
         }  catch (JSONException e) {
